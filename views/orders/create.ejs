@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+<h1>Passer une Commande  <a href="/orders"> retour </a> </h1>
+<% if (typeof error !== 'undefined' && error) { %>  <!-- Ajout : vérification safe -->
+  <p style="color: red;"><%= error %></p>
+<% } %>
+<form action="/orders/create" method="POST">
+  <label for="product_id">Produit:</label>
+  <select name="product_id" required>
+    <% products.forEach(product => { %>
+      <option value="<%= product.product_id %>"><%= product.name %> (Stock: <%= product.quantity %>)</option>
+    <% }) %>
+  </select>
+  <label for="quantity">Quantité:</label>
+  <input type="number" name="quantity" required min="1">
+  <label for="motif">Motif:</label>
+  <textarea name="motif" required></textarea>
+  <label for="delivery_comment">Commentaire de Livraison:</label>
+  <textarea name="delivery_comment"></textarea>
+  <button type="submit">Envoyer la Commande</button>
+</form>
+<%- include('../partials/footer') %>

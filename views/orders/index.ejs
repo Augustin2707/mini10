@@ -1,0 +1,93 @@
+<%- include('../partials/header') %>
+<h1>Bonjour <%= user.role === 'chef_principal' ? 'Chef Principal' : 'Chef de Service' %> <%= user.login %> - Commandes</h1>
+
+<!-- Correction : Section pour validations stock_entries (seulement chef, avec boutons Valider/Rejeter et motif) -->
+<% if (user.role === 'chef_principal') { %>
+  <h2>Propositions d'Ajout au Stock à Valider</h2>
+  <% if (typeof propositions !== 'undefined' && propositions.length > 0) { %>
+    <table border="1">
+      <tr><th>ID Proposition</th><th>Produit</th><th>Quantité Proposée</th><th>Proposé par</th><th>Date Proposition</th><th>Actions</th></tr>
+      <% propositions.forEach(prop => { %>
+        <tr>
+          <td><%= prop.entry_id %></td>
+          <td><%= prop.name %></td>
+          <td><%= prop.quantity_added %></td>
+          <td><%= prop.proposed_by %></td>
+          <td><%= prop.proposed_date %></td>
+          <td>
+            <!-- Formulaire Valider (sans motif) -->
+            <form action="/orders/stock-validate" method="POST" style="display:inline;">
+              <input type="hidden" name="entry_id" value="<%= prop.entry_id %>">
+              <input type="hidden" name="action" value="validate">
+              <button type="submit">Valider</button>
+            </form>
+            <!-- Formulaire Rejeter avec motif -->
+            <form action="/orders/stock-validate" method="POST" style="display:inline;">
+              <input type="hidden" name="entry_id" value="<%= prop.entry_id %>">
+              <input type="hidden" name="action" value="reject">
+              <label for="motif_rejet_<%= prop.entry_id %>">Motif rejet (optionnel) :</label>
+              <input type="text" name="motif_rejet" id="motif_rejet_<%= prop.entry_id %>" placeholder="Raison du rejet">
+              <button type="submit">Rejeter</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } else { %>
+    <p>Aucune proposition d'ajout au stock en attente.</p>
+  <% } %>
+<% } %>
+
+<table border="1">
+  <tr>
+    <% if (user.role === 'chef_principal') { %>
+      <th>ID</th><th>Produit</th><th>Quantité</th><th>Motif</th><th>Identifiant Auteur</th><th>Date et Heure Action</th><th>Statut</th><th>Actions</th>
+    <% } else { %>
+      <th>ID</th><th>Produit</th><th>Quantité</th><th>Motif</th><th>Date et Heure Réception</th><th>Identifiant Utilisateur</th><th>Statut</th><th>Actions</th>
+    <% } %>
+  </tr>
+  <% orders.forEach(order => { %>
+    <tr>
+      <td><%= order.order_id %></td>
+      <td><%= order.product_name %></td>
+      <td><%= order.quantity %></td>
+      <td><%= order.motif %></td>
+      <% if (user.role === 'chef_principal') { %>
+        <td><%= order.identifiant_auteur || order.identifiant_utilisateur %></td>  <!-- Correction : Fallback sans N/A -->
+        <td><%= order.date_heure_action || 'N/A' %></td>
+      <% } else { %>
+        <td><%= order.date_heure_reception || 'En cours' %></td>
+        <td><%= order.identifiant_utilisateur %></td>
+      <% } %>
+      <td><%= order.status %></td>
+      <td>
+        <% if (user.role === 'chef_principal' && order.status === 'pending') { %>
+          <form action="/orders/validate" method="POST" style="display:inline;">
+            <input type="hidden" name="order_id" value="<%= order.order_id %>">
+            <button type="submit">Valider</button>
+          </form>
+          <form action="/orders/reject" method="POST" style="display:inline;">
+            <input type="hidden" name="order_id" value="<%= order.order_id %>">
+            <button type="submit">Rejeter</button>
+          </form>
+        <% } %>
+        <% if (user.role === 'chef_service' && order.status === 'in_delivery') { %>
+          <form action="/orders/receive" method="POST" style="display:inline;">
+            <input type="hidden" name="order_id" value="<%= order.order_id %>">
+            <button type="submit">Reçu</button>
+          </form>
+        <% } else if (user.role === 'chef_service' && order.status === 'received') { %>
+          Livraison Confirmée
+        <% } %>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+<% if (user.role === 'chef_service') { %>
+  <a href="/orders/create">Passer une Nouvelle Commande</a>
+  <a href="/orders/suivi-service">Suivie</a>
+<% } %>
+<% if (user.role === 'chef_principal') { %>
+  <a href="/orders/suivi">Voir Suivi Chef</a>
+<% } %>
+<%- include('../partials/footer') %>

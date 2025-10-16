@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">📊 Suivi du Chef</h2>
+
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Produit</th>
+        <th>Quantité</th>
+        <th>Proposé par</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (actions.length > 0) { %>
+        <% actions.forEach(action => { %>
+          <tr>
+            <td><%= action.produit %></td>
+            <td><%= action.quantite %></td>
+            <td><%= action.propose_par %></td>
+            <td><%= action.date_heure %></td>
+            <td>
+              <% if (action.action === 'Entrée') { %>
+                <span class="badge bg-success">Entrée</span>
+              <% } else { %>
+                <span class="badge bg-primary">Sortie</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="5" class="text-center">Aucune action enregistrée.</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,27 @@
+<%- include('../partials/header') %>
+<h1>Suivi - <%= user.login %> (<%= user.role %>)</h1>
+<table border="1">
+  <tr>
+    <th>Date et Heure</th>
+    <th>Action</th>
+    <th>Produit</th>
+    <th>Quantité</th>
+    <th>Statut</th>
+    <th>Auteur</th>
+  </tr>
+  <% actions.forEach(action => { %>
+    <tr>
+      <td><%= action.date_heure %></td>
+      <td><%= action.action_display %></td>
+      <td><%= action.produit %></td>
+      <td><%= action.quantite %></td>
+      <td><%= action.statut %></td>
+      <td><%= action.auteur %></td>
+    </tr>
+  <% }) %>
+</table>
+<% if (actions.length === 0) { %>
+  <p>Aucune action récente trouvée pour votre rôle.</p>
+<% } %>
+<a href="/stock">Retour Stock</a>
+<%- include('../partials/footer') %>

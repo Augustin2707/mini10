@@ -1,0 +1,35 @@
+<!-- Inclusion du header -->
+<%- include('../partials/header') %>
+
+<!-- Titre personnalisé -->
+<h1>Suivi Personnel pour <%= user.login %></h1>
+
+<!-- Table des actions -->
+<table border="1">
+  <!-- En-têtes -->
+  <tr>
+    <th>Produit</th>
+    <th>Quantité</th>
+    <th>Statut</th>
+    <th>Action</th>
+    <th>Date</th>
+  </tr>
+  <!-- Boucle sur les actions -->
+  <% actions.forEach(action => { %>
+    <tr>
+      <!-- Nom du produit -->
+      <td><%= action.name %></td>
+      <!-- Quantité -->
+      <td><%= action.quantity %></td>
+      <!-- Statut de la commande -->
+      <td><%= action.status %></td>
+      <!-- Type d'action -->
+      <td><%= action.action_type %></td>
+      <!-- Date de l'action -->
+      <td><%= action.action_date %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<!-- Inclusion du footer -->
+<%- include('../partials/footer') %>

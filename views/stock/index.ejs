@@ -1,0 +1,76 @@
+<%- include('../partials/header') %>
+<h1>Bonjour <%= user.login %> - Gestion des Stocks</h1>
+
+<!-- Formulaire pour proposer ajout (comptable seulement, avec confirm JS) -->
+<h2>Proposer un Ajout au Stock (Validation Chef Requise)</h2>
+<form id="addStockForm" action="/stock/propose-add" method="POST">
+  <label for="product_id">Produit:</label>
+  <select name="product_id" id="product_id" required>
+    <% products.forEach(product => { %>
+      <option value="<%= product.product_id %>"><%= product.name %></option>
+    <% }) %>
+  </select>
+  <label for="quantity_added">Quantité:</label>
+  <input type="number" name="quantity_added" id="quantity_added" required min="1">
+  <button type="button" onclick="confirmAdd()">Proposer Ajout</button>
+</form>
+
+<script>
+function confirmAdd() {
+  const productId = document.getElementById('product_id').value;
+  const quantity = document.getElementById('quantity_added').value;
+  const productName = document.querySelector(`#product_id option[value="${productId}"]`).text;
+  if (confirm(`Voulez-vous ajouter le produit : ${productName} en quantité : ${quantity} ?`)) {
+    document.getElementById('addStockForm').submit();
+  }
+}
+</script>
+
+<h2>Stocks Actuels (Consultation Seulement)</h2>
+<table border="1">
+  <tr><th>Produit</th><th>Quantité</th></tr>  <!-- Pas d'actions pour comptable -->
+  <% stocks.forEach(stock => { %>
+    <tr>
+      <td><%= stock.name %></td>
+      <td><%= stock.quantity %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<h2>Commandes à Livrer</h2>
+<table border="1">
+  <tr><th>ID Commande</th><th>Produit</th><th>Quantité</th><th>Motif</th><th>Identifiant Utilisateur</th><th>Date et Heure Commande</th><th>Actions</th></tr>
+  <% orders.forEach(order => { %>
+    <tr>
+      <td><%= order.order_id %></td>
+      <td><%= order.product_name %></td>
+      <td><%= order.quantity %></td>
+      <td><%= order.motif %></td>
+      <td><%= order.identifiant_utilisateur %></td>
+      <td><%= order.date_heure_commande %></td>
+      <td>
+        <form action="/stock/deliver" method="POST">
+          <input type="hidden" name="order_id" value="<%= order.order_id %>">
+          <button type="submit">Livrer</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+
+<!-- Liste des Propositions en Attente (pour comptable voir ses props) -->
+<h2>Propositions d'Ajout en Attente</h2>
+<table border="1">
+  <tr><th>Produit</th><th>Quantité Proposée</th><th>Date Proposition</th><th>Statut</th></tr>
+  <% if (typeof propositions !== 'undefined') { propositions.forEach(prop => { %>
+    <tr>
+      <td><%= prop.name %></td>
+      <td><%= prop.quantity_added %></td>
+      <td><%= prop.proposed_date %></td>
+      <td><%= prop.status %></td>
+    </tr>
+  <% }); } %>
+</table>
+
+<a href="/stock/suivi">Voir Suivi Comptable</a>
+<%- include('../partials/footer') %>

@@ -1,0 +1,9 @@
+body { font-family: Arial, sans-serif; margin: 20px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+button { background-color: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer; }
+button:hover { background-color: #45a049; }
+form { margin-bottom: 20px; }
+label { display: block; margin-bottom: 5px; }
+input, select, textarea { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
