@@ -1,12 +1,50 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
-  <title>Gestion de Stock</title>
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Gestion de Stock' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <nav>
-    <a href="/">Accueil</a>
-    <a href="/profile">Suivi Personnel</a>
-    <a href="/auth/logout">Déconnexion</a>
-  </nav>
+<body class="bg-gray-50 min-h-full">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="text-white text-2xl mr-2">📦</i>
+                        <span class="text-white text-xl font-bold">StockFlow</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-4">
+                        <a href="/" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Accueil</a>
+                        <% if (typeof user !== 'undefined' && user) { %>
+                            <a href="/profile" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Suivi Personnel</a>
+                            <% if (user.role === 'comptable') { %>
+                                <a href="/stock" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Gestion Stock</a>
+                            <% } else if (user.role === 'chef_principal' || user.role === 'chef_service') { %>
+                                <a href="/orders" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Commandes</a>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <span class="text-blue-100 mr-4 text-sm">
+                            <i class="mr-1">👤</i><%= user.login %> (<%= user.role %>)
+                        </span>
+                        <a href="/auth/logout" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                            <i class="mr-1">🚪</i>Déconnexion
+                        </a>
+                    <% } else { %>
+                        <a href="/auth/login" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Connexion</a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">

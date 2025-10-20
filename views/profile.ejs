@@ -1,18 +1,122 @@
-<%- include('partials/header') %>
-<h1>Profil - <%= user.login %> (<%= user.role %>)
-  <a href="/orders">Retour</a>
-</h1>
-<h2>Mes Actions Récentes</h2>
-<table border="1">
-  <tr><th>Date</th><th>Action</th><th>Produit</th><th>Quantité</th><th>Statut</th></tr>
-  <% actions.forEach(action => { %>
-    <tr>
-      <td><%= action.action_date %></td>
-      <td><%= action.action_type %></td>
-      <td><%= action.name %></td>
-      <td><%= action.quantity %></td>
-      <td><%= action.status %></td>
-    </tr>
-  <% }) %>
-</table>
+<%- include('partials/header', { title: 'Mon Profil - StockFlow' }) %>
+
+<div class="container mx-auto px-4 py-6">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    <i class="mr-3">👤</i>Mon Profil
+                </h1>
+                <p class="text-gray-600">
+                    <span class="font-semibold text-blue-600"><%= user.login %></span> 
+                    - <span class="capitalize"><%= user.role %></span>
+                </p>
+            </div>
+            <a href="/orders" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                <i class="mr-2">←</i>Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="text-blue-600 text-xl">📊</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total Actions</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= actions.length %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                    <i class="text-green-600 text-xl">✅</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Actions Récentes</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= Math.min(actions.length, 10) %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-purple-100 p-3 rounded-lg">
+                    <i class="text-purple-600 text-xl">👑</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Rôle</h3>
+                    <p class="text-lg font-bold text-gray-900 capitalize"><%= user.role %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique des actions -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+                <i class="mr-2">📈</i>Mes Actions Récentes
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <% if (actions.length > 0) { %>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% actions.forEach(action => { %>
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <%= action.action_date %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                                <%= action.action_type %>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <%= action.name %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <%= action.quantity %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-badge 
+                                <%= action.status === 'pending' ? 'status-pending' :
+                                    action.status === 'validated' ? 'status-validated' :
+                                    action.status === 'rejected' ? 'status-rejected' :
+                                    'bg-gray-100 text-gray-800' %>">
+                                <%= action.status %>
+                            </span>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="px-6 py-12 text-center">
+                <i class="text-4xl text-gray-400 mb-4">📭</i>
+                <p class="text-gray-500 text-lg">Aucune action enregistrée pour le moment.</p>
+                <p class="text-gray-400 text-sm mt-2">Vos actions apparaîtront ici.</p>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
 <%- include('partials/footer') %>

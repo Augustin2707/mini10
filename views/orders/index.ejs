@@ -1,93 +1,225 @@
-<%- include('../partials/header') %>
-<h1>Bonjour <%= user.role === 'chef_principal' ? 'Chef Principal' : 'Chef de Service' %> <%= user.login %> - Commandes</h1>
+<%- include('../partials/header', { title: 'Gestion des Commandes - StockFlow' }) %>
 
-<!-- Correction : Section pour validations stock_entries (seulement chef, avec boutons Valider/Rejeter et motif) -->
-<% if (user.role === 'chef_principal') { %>
-  <h2>Propositions d'Ajout au Stock à Valider</h2>
-  <% if (typeof propositions !== 'undefined' && propositions.length > 0) { %>
-    <table border="1">
-      <tr><th>ID Proposition</th><th>Produit</th><th>Quantité Proposée</th><th>Proposé par</th><th>Date Proposition</th><th>Actions</th></tr>
-      <% propositions.forEach(prop => { %>
-        <tr>
-          <td><%= prop.entry_id %></td>
-          <td><%= prop.name %></td>
-          <td><%= prop.quantity_added %></td>
-          <td><%= prop.proposed_by %></td>
-          <td><%= prop.proposed_date %></td>
-          <td>
-            <!-- Formulaire Valider (sans motif) -->
-            <form action="/orders/stock-validate" method="POST" style="display:inline;">
-              <input type="hidden" name="entry_id" value="<%= prop.entry_id %>">
-              <input type="hidden" name="action" value="validate">
-              <button type="submit">Valider</button>
-            </form>
-            <!-- Formulaire Rejeter avec motif -->
-            <form action="/orders/stock-validate" method="POST" style="display:inline;">
-              <input type="hidden" name="entry_id" value="<%= prop.entry_id %>">
-              <input type="hidden" name="action" value="reject">
-              <label for="motif_rejet_<%= prop.entry_id %>">Motif rejet (optionnel) :</label>
-              <input type="text" name="motif_rejet" id="motif_rejet_<%= prop.entry_id %>" placeholder="Raison du rejet">
-              <button type="submit">Rejeter</button>
-            </form>
-          </td>
-        </tr>
-      <% }) %>
-    </table>
-  <% } else { %>
-    <p>Aucune proposition d'ajout au stock en attente.</p>
-  <% } %>
-<% } %>
+<div class="container mx-auto px-4 py-6">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="mr-3">📋</i>Gestion des Commandes
+        </h1>
+        <p class="text-gray-600">
+            Bonjour 
+            <span class="font-semibold text-blue-600"><%= user.login %></span> 
+            - <%= user.role === 'chef_principal' ? 'Chef Principal' : 'Chef de Service' %>
+        </p>
+    </div>
 
-<table border="1">
-  <tr>
+    <!-- Section Propositions Stock (Chef Principal seulement) -->
     <% if (user.role === 'chef_principal') { %>
-      <th>ID</th><th>Produit</th><th>Quantité</th><th>Motif</th><th>Identifiant Auteur</th><th>Date et Heure Action</th><th>Statut</th><th>Actions</th>
-    <% } else { %>
-      <th>ID</th><th>Produit</th><th>Quantité</th><th>Motif</th><th>Date et Heure Réception</th><th>Identifiant Utilisateur</th><th>Statut</th><th>Actions</th>
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="px-6 py-4 bg-yellow-50 border-b border-yellow-200">
+            <h2 class="text-lg font-medium text-yellow-800">
+                <i class="mr-2">⏳</i>Propositions d'Ajout au Stock à Valider
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <% if (typeof propositions !== 'undefined' && propositions.length > 0) { %>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proposé par</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% propositions.forEach(prop => { %>
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            #<%= prop.entry_id %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <%= prop.name %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <%= prop.quantity_added %>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <%= prop.proposed_by %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <%= prop.proposed_date %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <form action="/orders/stock-validate" method="POST" class="inline">
+                                    <input type="hidden" name="entry_id" value="<%= prop.entry_id %>">
+                                    <input type="hidden" name="action" value="validate">
+                                    <button type="submit" 
+                                            class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                                        <i class="mr-1">✅</i>Valider
+                                    </button>
+                                </form>
+                                <form action="/orders/stock-validate" method="POST" class="inline">
+                                    <input type="hidden" name="entry_id" value="<%= prop.entry_id %>">
+                                    <input type="hidden" name="action" value="reject">
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" name="motif_rejet" 
+                                               placeholder="Raison du rejet"
+                                               class="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                        <button type="submit" 
+                                                class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                                            <i class="mr-1">❌</i>Rejeter
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="px-6 py-8 text-center">
+                <i class="text-4xl text-yellow-400 mb-4">📭</i>
+                <p class="text-gray-500">Aucune proposition d'ajout au stock en attente.</p>
+            </div>
+            <% } %>
+        </div>
+    </div>
     <% } %>
-  </tr>
-  <% orders.forEach(order => { %>
-    <tr>
-      <td><%= order.order_id %></td>
-      <td><%= order.product_name %></td>
-      <td><%= order.quantity %></td>
-      <td><%= order.motif %></td>
-      <% if (user.role === 'chef_principal') { %>
-        <td><%= order.identifiant_auteur || order.identifiant_utilisateur %></td>  <!-- Correction : Fallback sans N/A -->
-        <td><%= order.date_heure_action || 'N/A' %></td>
-      <% } else { %>
-        <td><%= order.date_heure_reception || 'En cours' %></td>
-        <td><%= order.identifiant_utilisateur %></td>
-      <% } %>
-      <td><%= order.status %></td>
-      <td>
-        <% if (user.role === 'chef_principal' && order.status === 'pending') { %>
-          <form action="/orders/validate" method="POST" style="display:inline;">
-            <input type="hidden" name="order_id" value="<%= order.order_id %>">
-            <button type="submit">Valider</button>
-          </form>
-          <form action="/orders/reject" method="POST" style="display:inline;">
-            <input type="hidden" name="order_id" value="<%= order.order_id %>">
-            <button type="submit">Rejeter</button>
-          </form>
+
+    <!-- Tableau des Commandes -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-900">
+                <i class="mr-2">📦</i>Liste des Commandes
+            </h2>
+            <% if (user.role === 'chef_service') { %>
+            <a href="/orders/create" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
+                <i class="mr-2">➕</i>Nouvelle Commande
+            </a>
+            <% } %>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motif</th>
+                        <% if (user.role === 'chef_principal') { %>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Action</th>
+                        <% } else { %>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Réception</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                        <% } %>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% orders.forEach(order => { %>
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            #<%= order.order_id %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <%= order.product_name %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <%= order.quantity %>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                            <%= order.motif %>
+                        </td>
+                        <% if (user.role === 'chef_principal') { %>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= order.identifiant_auteur || order.identifiant_utilisateur %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= order.date_heure_action || 'N/A' %>
+                            </td>
+                        <% } else { %>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= order.date_heure_reception || 'En cours' %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= order.identifiant_utilisateur %>
+                            </td>
+                        <% } %>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-badge 
+                                <%= order.status === 'pending' ? 'status-pending' :
+                                    order.status === 'validated' ? 'status-validated' :
+                                    order.status === 'rejected' ? 'status-rejected' :
+                                    order.status === 'in_delivery' ? 'status-delivered' :
+                                    'bg-gray-100 text-gray-800' %>">
+                                <%= order.status %>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <% if (user.role === 'chef_principal' && order.status === 'pending') { %>
+                                    <form action="/orders/validate" method="POST" class="inline">
+                                        <input type="hidden" name="order_id" value="<%= order.order_id %>">
+                                        <button type="submit" 
+                                                class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                                            <i class="mr-1">✅</i>Valider
+                                        </button>
+                                    </form>
+                                    <form action="/orders/reject" method="POST" class="inline">
+                                        <input type="hidden" name="order_id" value="<%= order.order_id %>">
+                                        <button type="submit" 
+                                                class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                                            <i class="mr-1">❌</i>Rejeter
+                                        </button>
+                                    </form>
+                                <% } %>
+                                <% if (user.role === 'chef_service' && order.status === 'in_delivery') { %>
+                                    <form action="/orders/receive" method="POST" class="inline">
+                                        <input type="hidden" name="order_id" value="<%= order.order_id %>">
+                                        <button type="submit" 
+                                                class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                                            <i class="mr-1">📥</i>Reçu
+                                        </button>
+                                    </form>
+                                <% } else if (user.role === 'chef_service' && order.status === 'received') { %>
+                                    <span class="text-green-600 bg-green-50 px-3 py-1 rounded-md text-xs font-medium">
+                                        <i class="mr-1">✓</i>Confirmé
+                                    </span>
+                                <% } %>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Liens de navigation -->
+    <div class="mt-8 flex justify-center space-x-4">
+        <% if (user.role === 'chef_service') { %>
+            <a href="/orders/suivi-service" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                <i class="mr-2">📊</i>Mon Suivi
+            </a>
         <% } %>
-        <% if (user.role === 'chef_service' && order.status === 'in_delivery') { %>
-          <form action="/orders/receive" method="POST" style="display:inline;">
-            <input type="hidden" name="order_id" value="<%= order.order_id %>">
-            <button type="submit">Reçu</button>
-          </form>
-        <% } else if (user.role === 'chef_service' && order.status === 'received') { %>
-          Livraison Confirmée
+        <% if (user.role === 'chef_principal') { %>
+            <a href="/orders/suivi" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
+                <i class="mr-2">👑</i>Suivi Chef
+            </a>
         <% } %>
-      </td>
-    </tr>
-  <% }) %>
-</table>
-<% if (user.role === 'chef_service') { %>
-  <a href="/orders/create">Passer une Nouvelle Commande</a>
-  <a href="/orders/suivi-service">Suivie</a>
-<% } %>
-<% if (user.role === 'chef_principal') { %>
-  <a href="/orders/suivi">Voir Suivi Chef</a>
-<% } %>
+    </div>
+</div>
+
 <%- include('../partials/footer') %>
