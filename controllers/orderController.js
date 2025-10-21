@@ -18,7 +18,7 @@ exports.getOrders = (req, res) => {
       JOIN products p ON o.product_id = p.product_id 
       JOIN users u ON o.user_id = u.user_id
       LEFT JOIN order_actions oa ON o.order_id = oa.order_id AND oa.action_type IN ('validate', 'reject', 'deliver', 'receive')
-      WHERE o.status IN ('pending', 'validated', 'rejected')
+      WHERE o.status IN ('pending', 'validated')
       ORDER BY o.created_at DESC
     `, (err, orders) => {
       if (err) throw err;
@@ -41,12 +41,12 @@ exports.getOrders = (req, res) => {
     });
     return;
   } else if (user.role === 'chef_service') {
-    // MODIFICATION : Filtre seulement les commandes en cours / en attente de livraison (validated ou in_delivery)
+    // MODIFICATION : Inclut 'pending' pour afficher les commandes en cours
     query = `
       SELECT o.order_id, p.name AS product_name, o.quantity, o.motif, o.status, o.date_heure_reception,
              o.identifiant_utilisateur
       FROM orders o JOIN products p ON o.product_id = p.product_id 
-      WHERE o.user_id = ? AND o.status IN ('validated', 'in_delivery')
+      WHERE o.user_id = ? AND o.status IN ('pending', 'validated', 'in_delivery')
       ORDER BY o.created_at DESC
     `;
     params = [user.user_id];
@@ -130,6 +130,23 @@ exports.rejectOrder = (req, res) => {
   db.query('UPDATE orders SET status = "rejected" WHERE order_id = ?', [order_id], (err) => {
     if (err) throw err;
     db.query('INSERT INTO order_actions (order_id, user_id, action_type, auteur_login) VALUES (?, ?, "reject", ?)', 
+      [order_id, user_id, userLogin], (err) => {
+        if (err) throw err;
+        res.redirect('/orders');
+      });
+  });
+};
+
+exports.deliverOrder = (req, res) => {
+  const { order_id } = req.body;
+  const user_id = req.session.user.user_id;
+  const userLogin = req.session.user.login;
+  if (!req.session.user || req.session.user.role !== 'chef_service') {
+    return res.redirect('/auth/login');
+  }
+  db.query('UPDATE orders SET status = "in_delivery" WHERE order_id = ? AND status = "validated"', [order_id], (err) => {
+    if (err) throw err;
+    db.query('INSERT INTO order_actions (order_id, user_id, action_type, auteur_login) VALUES (?, ?, "deliver", ?)', 
       [order_id, user_id, userLogin], (err) => {
         if (err) throw err;
         res.redirect('/orders');

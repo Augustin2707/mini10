@@ -1,42 +1,140 @@
-<%- include('../partials/header') %>
+<%- include('../partials/header', { title: 'Suivi du Chef - StockFlow' }) %>
 
-<div class="container mt-5">
-  <h2 class="text-center mb-4">📊 Suivi du Chef <a href="/orders">Retour</a> </h2>
+<div class="container mx-auto px-4 py-6">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="mr-3">📊</i>Suivi du Chef
+            </h1>
+            <a href="/orders" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center">
+                <i class="mr-2">←</i>Retour
+            </a>
+        </div>
+        <p class="text-gray-600">Historique complet des entrées et sorties de stock</p>
+    </div>
 
-  <table class="table table-striped table-hover">
-    <thead class="table-dark">
-      <tr>
-        <th>Produit</th>
-        <th>Quantité</th>
-        <th>Proposé par</th>
-        <th>Date</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if (actions.length > 0) { %>
-        <% actions.forEach(action => { %>
-          <tr>
-            <td><%= action.produit %></td>
-            <td><%= action.quantite %></td>
-            <td><%= action.propose_par %></td>
-            <td><%= action.date_heure %></td>
-            <td>
-              <% if (action.action === 'Entrée') { %>
-                <span class="badge bg-success">Entrée</span>
-              <% } else { %>
-                <span class="badge bg-primary">Sortie</span>
-              <% } %>
-            </td>
-          </tr>
-        <% }) %>
-      <% } else { %>
-        <tr>
-          <td colspan="5" class="text-center">Aucune action enregistrée.</td>
-        </tr>
-      <% } %>
-    </tbody>
-  </table>
+    <!-- Carte de statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stock-card">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="text-blue-600 text-xl">📈</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total des actions</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= actions.length %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stock-card border-l-green-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                    <i class="text-green-600 text-xl">📥</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Entrées</h3>
+                    <p class="text-2xl font-bold text-gray-900">
+                        <%= actions.filter(a => a.action === 'Entrée').length %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stock-card border-l-red-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-red-100 p-3 rounded-lg">
+                    <i class="text-red-600 text-xl">📤</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Sorties</h3>
+                    <p class="text-2xl font-bold text-gray-900">
+                        <%= actions.filter(a => a.action === 'Sortie').length %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stock-card border-l-purple-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-purple-100 p-3 rounded-lg">
+                    <i class="text-purple-600 text-xl">👥</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Utilisateurs actifs</h3>
+                    <p class="text-2xl font-bold text-gray-900">
+                        <%= [...new Set(actions.map(a => a.propose_par))].length %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des actions -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">
+                <i class="mr-2">🕐</i>Historique des Actions Récentes
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proposé par</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (actions.length > 0) { %>
+                        <% actions.forEach(action => { %>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <%= action.produit %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <%= action.quantite %> unités
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= action.propose_par %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= action.date_heure %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <% if (action.action === 'Entrée') { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="mr-1">📥</i>Entrée
+                                    </span>
+                                <% } else { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <i class="mr-1">📤</i>Sortie
+                                    </span>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-4xl mb-2">📭</span>
+                                    Aucune action enregistrée.
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <%- include('../partials/footer') %>

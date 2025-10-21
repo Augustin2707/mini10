@@ -1,40 +1,163 @@
-<%- include('../partials/header') %>
-<div class="container mt-5">
-  <h2 class="text-center mb-4">📊 Mes Réceptions Confirmées
-    <a href="/orders">Retour</a>
-</h1>
-  </h2>
-  <table class="table table-striped table-hover">
-    <thead class="table-dark">
-      <tr>
-        <th>ID Produit</th>
-        <th>Produit</th>
-        <th>Quantité</th>
-        <th>Motif</th>
-        <th>Date</th>
-        <th>Auteur</th>
-        <th>Statut</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if (actions.length > 0) { %>
-        <% actions.forEach(action => { %>
-          <tr>
-            <td><%= action.id_produit %></td>
-            <td><%= action.produit %></td>
-            <td><%= action.quantite %></td>
-            <td><%= action.motif %></td>
-            <td><%= action.date_heure %></td>
-            <td><%= action.identification_auteur %></td>
-            <td><span class="badge bg-success"><%= action.statut %></span></td>
-            <td><span class="badge bg-info"><%= action.action %></span></td>
-          </tr>
-        <% }) %>
-      <% } else { %>
-        <tr><td colspan="8" class="text-center">Aucune réception confirmée.</td></tr>
-      <% } %>
-    </tbody>
-  </table>
+<%- include('../partials/header', { title: 'Réceptions Confirmées - StockFlow' }) %>
+
+<div class="container mx-auto px-4 py-6">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="mr-3">📊</i>Mes Réceptions Confirmées
+            </h1>
+            <a href="/orders" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center">
+                <i class="mr-2">←</i>Retour
+            </a>
+        </div>
+        <p class="text-gray-600">Historique des réceptions validées et traitées</p>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stock-card">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="text-blue-600 text-xl">✅</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total confirmé</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= actions.length %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stock-card border-l-green-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                    <i class="text-green-600 text-xl">📦</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Produits différents</h3>
+                    <p class="text-2xl font-bold text-gray-900">
+                        <%= [...new Set(actions.map(a => a.produit))].length %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stock-card border-l-purple-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-purple-100 p-3 rounded-lg">
+                    <i class="text-purple-600 text-xl">👤</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Auteurs</h3>
+                    <p class="text-2xl font-bold text-gray-900">
+                        <%= [...new Set(actions.map(a => a.identification_auteur))].length %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stock-card border-l-yellow-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-yellow-100 p-3 rounded-lg">
+                    <i class="text-yellow-600 text-xl">📅</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Période couverte</h3>
+                    <p class="text-2xl font-bold text-gray-900">
+                        <%= actions.length > 0 ? 'Active' : 'Aucune' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des réceptions confirmées -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">
+                <i class="mr-2">📋</i>Liste des Réceptions Confirmées
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motif</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (actions.length > 0) { %>
+                        <% actions.forEach(action => { %>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                #<%= action.id_produit %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <%= action.produit %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <%= action.quantite %> unités
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= action.motif %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= action.date_heure %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= action.identification_auteur %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="mr-1">✅</i><%= action.statut %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <i class="mr-1">📥</i><%= action.action %>
+                                </span>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-4xl mb-2">📭</span>
+                                    Aucune réception confirmée.
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section d'export -->
+    <div class="mt-8 text-center">
+        <button onclick="exportToExcel()" 
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 transition-colors duration-200">
+            <i class="mr-2">📊</i>Exporter vers Excel
+        </button>
+    </div>
 </div>
+
+<script>
+function exportToExcel() {
+    // Implémentation de l'export Excel
+    alert('Fonction d\'export Excel à implémenter');
+}
+</script>
+
 <%- include('../partials/footer') %>

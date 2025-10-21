@@ -30,7 +30,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Commandes à livrer</h3>
-                    <p class="text-2xl font-bold text-gray-900"><%= orders.length %></p>
+                    <p class="text-2xl font-bold text-gray-900"><%= (orders || []).length %></p>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Propositions en attente</h3>
-                    <p class="text-2xl font-bold text-gray-900"><%= propositions.length %></p>
+                    <p class="text-2xl font-bold text-gray-900"><%= (propositions || []).length %></p>
                 </div>
             </div>
         </div>
@@ -96,18 +96,24 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <% stocks.forEach(stock => { %>
-                        <tr class="hover:bg-gray-50 transition-colors duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <%= stock.name %>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    <%= stock.quantity %> unités
-                                </span>
-                            </td>
-                        </tr>
-                        <% }) %>
+                        <% if (stocks && stocks.length > 0) { %>
+                            <% stocks.forEach(stock => { %>
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <%= stock.name %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <%= stock.quantity %> unités
+                                    </span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500">Aucun stock disponible</td>
+                            </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
@@ -131,7 +137,61 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <% orders.forEach(order => { %>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    #<%= order.order_id %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <%= order.product_name %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <%= order.quantity %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <form action="/stock/deliver" method="POST" class="inline">
+                                        <input type="hidden" name="order_id" value="<%= order.order_id %>">
+                                        <button type="submit" 
+                                                class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                                            <i class="mr-1">📦</i>Livrer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Aucune commande à livrer</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOUVELLE SECTION : Commandes en Livraison -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mt-8">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">
+                <i class="mr-2">🚛</i>Commandes en Livraison (En Traitement)
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commande</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Livraison</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (ordersInDelivery && ordersInDelivery.length > 0) { %>
+                        <% ordersInDelivery.forEach(order => { %>
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 #<%= order.order_id %>
@@ -142,20 +202,23 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <%= order.quantity %>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <form action="/stock/deliver" method="POST" class="inline">
-                                    <input type="hidden" name="order_id" value="<%= order.order_id %>">
-                                    <button type="submit" 
-                                            class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
-                                        <i class="mr-1">📦</i>Livrer
-                                    </button>
-                                </form>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= order.date_heure_commande %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    En traitement
+                                </span>
                             </td>
                         </tr>
                         <% }) %>
-                    </tbody>
-                </table>
-            </div>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Aucune commande en livraison</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -177,7 +240,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <% if (typeof propositions !== 'undefined' && propositions.length > 0) { %>
+                    <% if (propositions && propositions.length > 0) { %>
                         <% propositions.forEach(prop => { %>
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -223,7 +286,7 @@ function confirmAdd() {
     const quantity = document.getElementById('quantity_added').value;
     const productName = document.querySelector(`#product_id option[value="${productId}"]`).text;
     
-    if (app.confirmAction(`Voulez-vous proposer l'ajout de ${quantity} unités pour le produit "${productName}" ?`)) {
+    if (confirm(`Voulez-vous proposer l'ajout de ${quantity} unités pour le produit "${productName}" ?`)) {
         document.getElementById('addStockForm').submit();
     }
 }
