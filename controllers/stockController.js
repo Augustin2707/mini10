@@ -1,10 +1,10 @@
 const db = require('../config/db');
 
 exports.getStockIndex = (req, res) => {
-  if (!req.session.user) {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
     return res.redirect('/auth/login');
   }
-  const user = req.session.user;
 
   // Fetch produits pour formulaire
   db.query('SELECT * FROM products', (err, products) => {
@@ -19,11 +19,11 @@ exports.getStockIndex = (req, res) => {
       if (err) throw err;
 
       // CORRECTION : Fetch séparé pour commandes à livrer ('validated') ET en livraison ('in_delivery')
-      // Seulement pour comptable ou chef_service
+      // Seulement pour comptable ou admin
       let ordersToDeliverQuery = '';
       let ordersInDeliveryQuery = '';
       let params = [];
-      if (user.role === 'comptable' || user.role === 'chef_service') {
+      if (user.role === 'comptable' || user.role === 'admin') {
         // À livrer : validated
         ordersToDeliverQuery = `
           SELECT o.order_id, p.name AS product_name, o.quantity, o.motif, o.identifiant_utilisateur,
@@ -49,7 +49,7 @@ exports.getStockIndex = (req, res) => {
         if (errToDeliver) throw errToDeliver;
         if (errInDelivery) throw errInDelivery;
 
-        // Fetch propositions en attente (pour comptable voir ses props)
+        // Fetch propositions en attente (pour comptable/admin voir ses props)
         db.query('SELECT se.*, p.name FROM stock_entries se JOIN products p ON se.product_id = p.product_id WHERE se.status = "pending"', (err, propositions) => {
           if (err) throw err;
 
@@ -93,7 +93,8 @@ exports.getStockIndex = (req, res) => {
 };
 
 exports.proposeStockAdd = (req, res) => {
-  if (!req.session.user || req.session.user.role !== 'comptable') {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
     return res.redirect('/stock');
   }
   const { product_id, quantity_added } = req.body;
@@ -111,12 +112,15 @@ exports.proposeStockAdd = (req, res) => {
 
 // CORRECTION : Fonction deliverOrder bien exportée et robuste
 exports.deliverOrder = (req, res) => {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
+    return res.redirect('/auth/login');
+  }
+  
   const { order_id } = req.body;
   const user_id = req.session.user.user_id;
   const userLogin = req.session.user.login;
-  if (!req.session.user || req.session.user.role !== 'comptable') {
-    return res.redirect('/auth/login');
-  }
+  
   // Vérifie d'abord si validated
   db.query('SELECT status FROM orders WHERE order_id = ?', [order_id], (err, result) => {
     if (err) {
@@ -156,10 +160,12 @@ exports.deliverOrder = (req, res) => {
 
 // Bloqué pour comptable : Redirige vers consultation
 exports.getEditStock = (req, res) => {
-  const { stock_id } = req.params;
-  if (req.session.user.role === 'comptable') {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
     return res.redirect('/stock');  // Ne peut pas éditer
   }
+  
+  const { stock_id } = req.params;
   db.query('SELECT s.*, p.name FROM stock s JOIN products p ON s.product_id = p.product_id WHERE s.stock_id = ?', [stock_id], (err, stock) => {
     if (err) throw err;
     res.render('stock/edit', { stock: stock[0] });
@@ -167,9 +173,11 @@ exports.getEditStock = (req, res) => {
 };
 
 exports.updateStock = (req, res) => {
-  if (req.session.user.role !== 'chef_principal') {  // Réservé au chef
+  const user = req.session.user;
+  if (!user || user.role !== 'chef_principal') {  // Réservé au chef seulement
     return res.redirect('/stock');
   }
+  
   const { stock_id, quantity } = req.body;
   db.query('UPDATE stock SET quantity = ?, updated_at = NOW() WHERE stock_id = ?', [quantity, stock_id], (err) => {
     if (err) throw err;
@@ -178,14 +186,16 @@ exports.updateStock = (req, res) => {
   });
 };
 
-// Version corrigée et étendue : Suivi générique pour tous rôles (chef_service=utl1, comptable, chef_principal)
+// Version corrigée et étendue : Suivi générique pour tous rôles (chef_service=utl1, comptable, chef_principal, admin)
 exports.getSuivi = (req, res) => {
-  if (!req.session.user) {
+  const user = req.session.user;
+  if (!user) {
     return res.redirect('/auth/login');
   }
-  const role = req.session.user.role;
-  const userId = req.session.user.user_id;
-  const userLogin = req.session.user.login;
+  
+  const role = user.role;
+  const userId = user.user_id;
+  const userLogin = user.login;
 
   // Logique conditionnelle par rôle
   let query = '';
@@ -206,8 +216,8 @@ exports.getSuivi = (req, res) => {
     `;
     params = [userId];
 
-  } else if (role === 'comptable') {
-    // Requête unifiée pour comptable : livraisons + propositions/ajouts stock - CORRIGÉE pour statuts
+  } else if (role === 'comptable' || role === 'admin') {
+    // Requête unifiée pour comptable/admin : livraisons + propositions/ajouts stock - CORRIGÉE pour statuts
     query = `
       -- Livraisons (commandes validées et livrées = sorties)
       SELECT 
@@ -307,11 +317,19 @@ exports.getSuivi = (req, res) => {
 
 // Autres fonctions (si tu en as d'autres, ajoute-les ici – ex. validateOrder si besoin)
 exports.validateOrder = (req, res) => {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
+    return res.redirect('/auth/login');
+  }
   // Si cette fonction existe ailleurs, copie-la ici ou supprime la route si inutilisée
   res.redirect('/stock');  // Placeholder – adapte si besoin
 };
 
 exports.validateStockEntry = (req, res) => {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
+    return res.redirect('/auth/login');
+  }
   // Si cette fonction existe dans orderController, déplace-la ou adapte
   res.redirect('/stock');  // Placeholder – adapte si besoin
 };

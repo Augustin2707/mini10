@@ -2,11 +2,12 @@ const db = require('../config/db');
 
 exports.getOrders = (req, res) => {
   const user = req.session.user;
-  if (!user) {
+  if (!user || (user.role !== 'chef_principal' && user.role !== 'chef_service' && user.role !== 'admin')) {
     return res.redirect('/auth/login');
   }
+  
   let query, params;
-  if (user.role === 'chef_principal') {
+  if (user.role === 'chef_principal' || user.role === 'admin') {
     db.query(`
       SELECT o.order_id, p.name AS product_name, o.quantity, o.motif, o.status, o.created_at as date_heure_action,
              CASE 
@@ -107,7 +108,7 @@ exports.validateOrder = (req, res) => {
   const { order_id } = req.body;
   const user_id = req.session.user.user_id;
   const userLogin = req.session.user.login;
-  if (!req.session.user || req.session.user.role !== 'chef_principal') {
+  if (!req.session.user || (req.session.user.role !== 'chef_principal' && req.session.user.role !== 'admin')) {
     return res.redirect('/auth/login');
   }
   db.query('UPDATE orders SET status = "validated" WHERE order_id = ?', [order_id], (err) => {
@@ -124,7 +125,7 @@ exports.rejectOrder = (req, res) => {
   const { order_id } = req.body;
   const user_id = req.session.user.user_id;
   const userLogin = req.session.user.login;
-  if (!req.session.user || req.session.user.role !== 'chef_principal') {
+  if (!req.session.user || (req.session.user.role !== 'chef_principal' && req.session.user.role !== 'admin')) {
     return res.redirect('/auth/login');
   }
   db.query('UPDATE orders SET status = "rejected" WHERE order_id = ?', [order_id], (err) => {
@@ -174,7 +175,7 @@ exports.receiveOrder = (req, res) => {
 exports.validateStockEntry = (req, res) => {
   const { entry_id, action } = req.body;
   const userLogin = req.session.user.login;
-  if (!req.session.user || req.session.user.role !== 'chef_principal') {
+  if (!req.session.user || (req.session.user.role !== 'chef_principal' && req.session.user.role !== 'admin')) {
     return res.redirect('/orders');
   }
   const newStatus = action === 'validate' ? 'validated' : 'rejected';
@@ -191,7 +192,7 @@ exports.validateStockEntry = (req, res) => {
 
 // NOUVELLE FONCTIONNALITÉ : Suivi Chef complet - CORRIGÉ
 exports.getSuiviChef = (req, res) => {
-  if (!req.session.user || req.session.user.role !== 'chef_principal') {
+  if (!req.session.user || (req.session.user.role !== 'chef_principal' && req.session.user.role !== 'admin')) {
     return res.redirect('/auth/login');
   }
 

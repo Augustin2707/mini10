@@ -15,12 +15,17 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+const adminRoutes = require('./routes/admin');
+app.use('/admin', adminRoutes);
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 const stockRoutes = require('./routes/stock');
 app.use('/stock', stockRoutes);
 const orderRoutes = require('./routes/orders');
 app.use('/orders', orderRoutes);
+app.get('/apropos', (req, res) => {
+  res.render('apropos', { title: 'À propos - StockFlow' });  // Utilise la vue existante
+});
 
 // Route pour chef éditer stock directement (ex. /stock/chef-edit/:id → mais utilise /stock/edit)
 const stockController = require('./controllers/stockController');

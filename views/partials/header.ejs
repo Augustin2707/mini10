@@ -19,9 +19,12 @@
                     </div>
                     <div class="hidden md:ml-6 md:flex md:space-x-4">
                         <a href="/" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Accueil</a>
+                        <a href="/apropos" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">À propos</a>
                         <% if (typeof user !== 'undefined' && user) { %>
                             <a href="/profile" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Suivi Personnel</a>
-                            <% if (user.role === 'comptable') { %>
+                            <% if (user.role === 'admin') { %>
+                                <a href="/admin" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</a>
+                            <% } else if (user.role === 'comptable') { %>
                                 <a href="/stock" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Gestion Stock</a>
                             <% } else if (user.role === 'chef_principal' || user.role === 'chef_service') { %>
                                 <a href="/orders" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Commandes</a>

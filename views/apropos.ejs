@@ -1,0 +1,146 @@
+<%- include('partials/header', { title: 'À propos - StockFlow' }) %>
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        Bienvenue sur <span class="text-yellow-300">StockFlow</span>
+      </h1>
+      <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+        Une application de gestion de stock intuitive et sécurisée, conçue pour optimiser les flux de commandes et les livraisons au sein de votre entreprise.
+      </p>
+      <a href="/auth/login" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+        Se connecter
+      </a>
+    </div>
+  </section>
+
+  <!-- Introduction et Contexte -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Introduction</h2>
+          <p class="text-lg text-gray-600 mb-6">
+            StockFlow est un MVP (Minimum Viable Product) développé pour une gestion simplifiée des stocks, des commandes et des livraisons. Ce projet répond aux besoins d'une entreprise en facilitant la traçabilité des opérations tout en respectant des contraintes de sécurité et d'efficacité.
+          </p>
+          <p class="text-lg text-gray-600">
+            Conçu en 4 semaines, il intègre une authentification robuste et une interface web responsive, sans fonctionnalités superflues, pour une démonstration claire et efficace.
+          </p>
+        </div>
+        <div class="relative">
+          <div class="bg-blue-50 rounded-lg p-8 shadow-lg">
+            <i class="text-6xl text-blue-500 mb-4 block">📦</i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Objectif Principal</h3>
+            <p class="text-gray-600">Améliorer la gestion des stocks pour les comptables et assurer un suivi précis des commandes pour les chefs et utilisateurs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rôles Utilisateurs -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Rôles et Accès</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+          <i class="text-4xl text-green-500 mb-4 block">👤</i>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Comptable (Livreur)</h3>
+          <ul class="text-gray-600 space-y-2 text-sm">
+            <li>• Ajoute des produits au stock</li>
+            <li>• Gère les livraisons et diminue le stock automatiquement</li>
+            <li>• Suivi personnel des actions</li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+          <i class="text-4xl text-blue-500 mb-4 block">👨‍💼</i>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Chef de Service</h3>
+          <ul class="text-gray-600 space-y-2 text-sm">
+            <li>• Valide ou rejette les commandes</li>
+            <li>• Accès aux commandes en attente</li>
+            <li>• Suivi des validations effectuées</li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+          <i class="text-4xl text-purple-500 mb-4 block">👥</i>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Chefs de Division (Utilisateurs)</h3>
+          <ul class="text-gray-600 space-y-2 text-sm">
+            <li>• Passe des commandes (si stock > 0)</li>
+            <li>• Ajoute motif et commentaire de livraison</li>
+            <li>• Confirme les réceptions et suit ses commandes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fonctionnalités Principales -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Fonctionnalités Clés</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-4">Flux des Commandes</h3>
+          <ol class="list-decimal list-inside text-gray-600 space-y-2 mb-6">
+            <li>Passage de commande par un utilisateur (avec motif et commentaire).</li>
+            <li>Validation ou rejet par le chef de service.</li>
+            <li>Livraison par le comptable, avec diminution automatique du stock.</li>
+            <li>Confirmation de réception par l'utilisateur.</li>
+          </ol>
+          <p class="text-gray-600">Stocks en temps réel : Impossible de commander si stock = 0.</p>
+        </div>
+        <div>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-4">Suivi et Sécurité</h3>
+          <ul class="list-disc list-inside text-gray-600 space-y-2">
+            <li>• Authentification sécurisée (hachage des mots de passe).</li>
+            <li>• Sessions pour traçabilité des actions par login.</li>
+            <li>• Pages de suivi personnel pour chaque rôle.</li>
+            <li>• Interface simple et responsive (mobile-friendly).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technologies -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-12">Technologies Utilisées</h2>
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <i class="text-3xl text-green-500 mb-2 block">🐘</i>
+          <p class="font-semibold">Node.js + Express</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <i class="text-3xl text-blue-500 mb-2 block">🗄️</i>
+          <p class="font-semibold">MySQL</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <i class="text-3xl text-orange-500 mb-2 block">📄</i>
+          <p class="font-semibold">EJS Templates</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <i class="text-3xl text-indigo-500 mb-2 block">🎨</i>
+          <p class="font-semibold">Tailwind CSS</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conclusion -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-6">Prêt à Optimiser Vos Stocks ?</h2>
+      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+        StockFlow est plus qu'un outil : c'est une solution simple pour une gestion fluide et traçable. Contactez-nous pour une démonstration personnalisée.
+      </p>
+      <a href="/auth/login" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+        Commencer Maintenant
+      </a>
+    </div>
+  </section>
+</div>
+
+<%- include('partials/footer') %>

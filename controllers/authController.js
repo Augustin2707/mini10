@@ -19,11 +19,12 @@ exports.postLogin = (req, res) => {
         return res.render('auth/login', { error: 'Mot de passe incorrect' });
       }
       req.session.user = { user_id: user.user_id, login: user.login, role: user.role };
-      if (user.role === 'comptable') {
+      // Ajout pour admin
+      if (user.role === 'admin') {
+        res.redirect('/admin');
+      } else if (user.role === 'comptable') {
         res.redirect('/stock');
-      } else if (user.role === 'chef_principal') {
-        res.redirect('/orders');
-      } else if (user.role === 'chef_service') {
+      } else if (user.role === 'chef_principal' || user.role === 'chef_service') {
         res.redirect('/orders');
       } else {
         req.session.destroy();
@@ -48,7 +49,7 @@ exports.postRegister = (req, res) => {
     if (err) throw err;
     db.query('INSERT INTO users (login, password, role) VALUES (?, ?, ?)', [login, hashedPassword, role], (err) => {
       if (err) {
-        return res.render('auth/register', { error: 'Erreur lors de l’inscription (login déjà utilisé ?)' });
+        return res.render('auth/register', { error: 'Erreur lors de l\'inscription (login déjà utilisé ?)' });
       }
       res.redirect('/auth/login');
     });
