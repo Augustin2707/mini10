@@ -1,39 +1,86 @@
 <%- include('partials/header', { title: 'À propos - StockFlow' }) %>
 
 <div class="min-h-screen bg-gray-50">
-  <!-- Hero Section -->
-  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-    <div class="container mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">
-        Bienvenue sur <span class="text-yellow-300">StockFlow</span>
-      </h1>
-      <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-        Une application de gestion de stock intuitive et sécurisée, conçue pour optimiser les flux de commandes et les livraisons au sein de votre entreprise.
-      </p>
-      <a href="/auth/login" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
-        Se connecter
-      </a>
+  <!-- En-tête avec navigation -->
+  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          Découvrez <span class="text-yellow-300">StockFlow</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 leading-relaxed">
+          La solution innovante de gestion de stock qui optimise vos commandes et rationalise vos livraisons.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/auth/login" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300 shadow-md">
+            Accéder à l'application
+          </a>
+          <a href="#fonctionnalites" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300">
+            Explorer les fonctionnalités
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Introduction et Contexte -->
+  <!-- Présentation de l'application -->
   <section class="py-16 bg-white">
     <div class="container mx-auto px-4">
       <div class="grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <h2 class="text-3xl font-bold text-gray-900 mb-6">Introduction</h2>
-          <p class="text-lg text-gray-600 mb-6">
-            StockFlow est un MVP (Minimum Viable Product) développé pour une gestion simplifiée des stocks, des commandes et des livraisons. Ce projet répond aux besoins d'une entreprise en facilitant la traçabilité des opérations tout en respectant des contraintes de sécurité et d'efficacité.
+          <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+            Notre Mission
+          </span>
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Simplifier la gestion de vos stocks</h2>
+          <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+            StockFlow est une application web conçue pour optimiser la gestion des stocks, des commandes et des livraisons. 
+            Notre solution offre une traçabilité complète, une sécurité renforcée et une efficacité opérationnelle.
           </p>
-          <p class="text-lg text-gray-600">
-            Conçu en 4 semaines, il intègre une authentification robuste et une interface web responsive, sans fonctionnalités superflues, pour une démonstration claire et efficace.
+          <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+            Développée en un temps record de 4 semaines, cette application MVP intègre une authentification robuste 
+            et une interface responsive, centrée sur l'essentiel.
           </p>
+          <div class="flex items-center mt-8">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+              <i class="text-blue-600 text-xl">✓</i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Objectif principal</h3>
+              <p class="text-gray-600">Optimiser la gestion des stocks pour les comptables et rationaliser le suivi des commandes pour les chefs de service.</p>
+            </div>
+          </div>
         </div>
         <div class="relative">
-          <div class="bg-blue-50 rounded-lg p-8 shadow-lg">
-            <i class="text-6xl text-blue-500 mb-4 block">📦</i>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">Objectif Principal</h3>
-            <p class="text-gray-600">Améliorer la gestion des stocks pour les comptables et assurer un suivi précis des commandes pour les chefs et utilisateurs.</p>
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 shadow-lg border border-blue-100">
+            <div class="flex items-center mb-6">
+              <div class="w-14 h-14 bg-blue-600 rounded-lg flex items-center justify-center mr-4">
+                <i class="text-white text-2xl">📦</i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">Gestion intuitive</h3>
+                <p class="text-gray-600">Interface conçue pour une prise en main immédiate</p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1 mr-3 flex-shrink-0">
+                  <i class="text-green-600 text-xs">✓</i>
+                </div>
+                <p class="text-gray-700">Traçabilité complète de chaque opération</p>
+              </div>
+              <div class="flex items-start">
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1 mr-3 flex-shrink-0">
+                  <i class="text-green-600 text-xs">✓</i>
+                </div>
+                <p class="text-gray-700">Mises à jour en temps réel des stocks</p>
+              </div>
+              <div class="flex items-start">
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1 mr-3 flex-shrink-0">
+                  <i class="text-green-600 text-xs">✓</i>
+                </div>
+                <p class="text-gray-700">Sécurité et contrôle d'accès par profil</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -41,64 +88,194 @@
   </section>
 
   <!-- Rôles Utilisateurs -->
-  <section class="py-16 bg-gray-50">
+  <section class="py-16 bg-gray-50" id="roles">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Rôles et Accès</h2>
+      <div class="text-center mb-12">
+        <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+          Organisation
+        </span>
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Rôles et permissions</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Chaque utilisateur dispose de fonctionnalités adaptées à ses responsabilités
+        </p>
+      </div>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-          <i class="text-4xl text-green-500 mb-4 block">👤</i>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">Comptable (Livreur)</h3>
-          <ul class="text-gray-600 space-y-2 text-sm">
-            <li>• Ajoute des produits au stock</li>
-            <li>• Gère les livraisons et diminue le stock automatiquement</li>
-            <li>• Suivi personnel des actions</li>
-          </ul>
+        <!-- Comptable -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="bg-green-500 h-2 w-full"></div>
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                <i class="text-green-600 text-xl">👤</i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Comptable</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Gestion des stocks et des livraisons</p>
+            <ul class="text-gray-600 space-y-3">
+              <li class="flex items-start">
+                <i class="text-green-500 mr-2 mt-1">•</i>
+                <span>Ajout de produits au stock</span>
+              </li>
+              <li class="flex items-start">
+                <i class="text-green-500 mr-2 mt-1">•</i>
+                <span>Gestion des livraisons (déduction automatique du stock)</span>
+              </li>
+              <li class="flex items-start">
+                <i class="text-green-500 mr-2 mt-1">•</i>
+                <span>Suivi détaillé des actions</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-          <i class="text-4xl text-blue-500 mb-4 block">👨‍💼</i>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">Chef de Service</h3>
-          <ul class="text-gray-600 space-y-2 text-sm">
-            <li>• Valide ou rejette les commandes</li>
-            <li>• Accès aux commandes en attente</li>
-            <li>• Suivi des validations effectuées</li>
-          </ul>
+        
+        <!-- Chef de Service -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="bg-blue-500 h-2 w-full"></div>
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                <i class="text-blue-600 text-xl">👨‍💼</i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Chef de Service</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Validation et supervision des commandes</p>
+            <ul class="text-gray-600 space-y-3">
+              <li class="flex items-start">
+                <i class="text-blue-500 mr-2 mt-1">•</i>
+                <span>Validation ou rejet des commandes</span>
+              </li>
+              <li class="flex items-start">
+                <i class="text-blue-500 mr-2 mt-1">•</i>
+                <span>Accès aux commandes en attente de validation</span>
+              </li>
+              <li class="flex items-start">
+                <i class="text-blue-500 mr-2 mt-1">•</i>
+                <span>Suivi des validations effectuées</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-          <i class="text-4xl text-purple-500 mb-4 block">👥</i>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">Chefs de Division (Utilisateurs)</h3>
-          <ul class="text-gray-600 space-y-2 text-sm">
-            <li>• Passe des commandes (si stock > 0)</li>
-            <li>• Ajoute motif et commentaire de livraison</li>
-            <li>• Confirme les réceptions et suit ses commandes</li>
-          </ul>
+        
+        <!-- Chefs de Division -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="bg-purple-500 h-2 w-full"></div>
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                <i class="text-purple-600 text-xl">👥</i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Chefs de Division</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Passation et suivi des commandes</p>
+            <ul class="text-gray-600 space-y-3">
+              <li class="flex items-start">
+                <i class="text-purple-500 mr-2 mt-1">•</i>
+                <span>Passation de commandes (uniquement si stock disponible)</span>
+              </li>
+              <li class="flex items-start">
+                <i class="text-purple-500 mr-2 mt-1">•</i>
+                <span>Ajout de motifs et commentaires</span>
+              </li>
+              <li class="flex items-start">
+                <i class="text-purple-500 mr-2 mt-1">•</i>
+                <span>Confirmation des réceptions et suivi</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Fonctionnalités Principales -->
-  <section class="py-16 bg-white">
+  <section class="py-16 bg-white" id="fonctionnalites">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Fonctionnalités Clés</h2>
-      <div class="grid md:grid-cols-2 gap-8">
+      <div class="text-center mb-12">
+        <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+          Processus
+        </span>
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Fonctionnalités principales</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Un flux rationalisé pour une gestion optimale de vos stocks
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-12">
         <div>
-          <h3 class="text-2xl font-semibold text-gray-900 mb-4">Flux des Commandes</h3>
-          <ol class="list-decimal list-inside text-gray-600 space-y-2 mb-6">
-            <li>Passage de commande par un utilisateur (avec motif et commentaire).</li>
-            <li>Validation ou rejet par le chef de service.</li>
-            <li>Livraison par le comptable, avec diminution automatique du stock.</li>
-            <li>Confirmation de réception par l'utilisateur.</li>
-          </ol>
-          <p class="text-gray-600">Stocks en temps réel : Impossible de commander si stock = 0.</p>
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Flux de commandes rationalisé</h3>
+          <div class="space-y-6">
+            <div class="flex">
+              <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4">1</div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Commande utilisateur</h4>
+                <p class="text-gray-600">Les chefs de division passent commande avec motif et commentaire.</p>
+              </div>
+            </div>
+            <div class="flex">
+              <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4">2</div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Validation chef de service</h4>
+                <p class="text-gray-600">Le chef de service valide ou rejette la commande selon les besoins.</p>
+              </div>
+            </div>
+            <div class="flex">
+              <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4">3</div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Livraison comptable</h4>
+                <p class="text-gray-600">Le comptable gère la livraison avec déduction automatique du stock.</p>
+              </div>
+            </div>
+            <div class="flex">
+              <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4">4</div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Confirmation réception</h4>
+                <p class="text-gray-600">Le chef de division confirme la réception des produits.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <p class="text-blue-700 font-medium">Stocks en temps réel : aucune commande possible si stock insuffisant.</p>
+          </div>
         </div>
         <div>
-          <h3 class="text-2xl font-semibold text-gray-900 mb-4">Suivi et Sécurité</h3>
-          <ul class="list-disc list-inside text-gray-600 space-y-2">
-            <li>• Authentification sécurisée (hachage des mots de passe).</li>
-            <li>• Sessions pour traçabilité des actions par login.</li>
-            <li>• Pages de suivi personnel pour chaque rôle.</li>
-            <li>• Interface simple et responsive (mobile-friendly).</li>
-          </ul>
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Sécurité et traçabilité</h3>
+          <div class="space-y-6">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-4 mt-1">
+                <i class="text-lg">🔒</i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Authentification robuste</h4>
+                <p class="text-gray-600">Système de connexion sécurisé avec hachage des mots de passe.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-4 mt-1">
+                <i class="text-lg">📊</i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Traçabilité complète</h4>
+                <p class="text-gray-600">Sessions et actions tracées par identifiant de connexion.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-4 mt-1">
+                <i class="text-lg">👁️</i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Pages de suivi par rôle</h4>
+                <p class="text-gray-600">Interface adaptée aux responsabilités de chaque utilisateur.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-4 mt-1">
+                <i class="text-lg">📱</i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Interface responsive</h4>
+                <p class="text-gray-600">Expérience utilisateur optimisée sur tous les appareils.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -106,39 +283,97 @@
 
   <!-- Technologies -->
   <section class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold text-gray-900 mb-12">Technologies Utilisées</h2>
-      <div class="grid md:grid-cols-4 gap-6">
-        <div class="bg-white p-4 rounded-lg shadow-md">
-          <i class="text-3xl text-green-500 mb-2 block">🐘</i>
-          <p class="font-semibold">Node.js + Express</p>
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+          Stack Technique
+        </span>
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Technologies utilisées</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Une stack moderne et performante pour une expérience optimale
+        </p>
+      </div>
+      <div class="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div class="bg-white p-6 rounded-xl shadow-md text-center transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="text-green-600 text-2xl">🚀</i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Node.js + Express</h3>
+          <p class="text-gray-600 text-sm">Backend performant et scalable</p>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-md">
-          <i class="text-3xl text-blue-500 mb-2 block">🗄️</i>
-          <p class="font-semibold">MySQL</p>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="text-blue-600 text-2xl">🗄️</i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">MySQL</h3>
+          <p class="text-gray-600 text-sm">Base de données relationnelle fiable</p>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-md">
-          <i class="text-3xl text-orange-500 mb-2 block">📄</i>
-          <p class="font-semibold">EJS Templates</p>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="text-orange-600 text-2xl">📄</i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">EJS</h3>
+          <p class="text-gray-600 text-sm">Moteur de templates dynamique</p>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-md">
-          <i class="text-3xl text-indigo-500 mb-2 block">🎨</i>
-          <p class="font-semibold">Tailwind CSS</p>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center transition-transform duration-300 hover:transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="text-indigo-600 text-2xl">🎨</i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Tailwind CSS</h3>
+          <p class="text-gray-600 text-sm">Framework CSS utilitaire moderne</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Conclusion -->
+  <!-- Informations du Projet -->
   <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+          Informations
+        </span>
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Détails du projet</h2>
+      </div>
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Nom du projet</h3>
+              <p class="text-gray-700 text-lg">StockFlow - Gestion de Stock</p>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Auteur</h3>
+              <p class="text-gray-700 text-lg">RATSIRAHONANA Andrianirina Bien-Venu Mc Augustin</p>
+            </div>
+          </div>
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Date de création</h3>
+              <p class="text-gray-700 text-lg">07 Octobre 2025</p>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Type</h3>
+              <p class="text-gray-700 text-lg">Application Web MVP</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Appel à l'action -->
+  <section class="py-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold text-gray-900 mb-6">Prêt à Optimiser Vos Stocks ?</h2>
-      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-        StockFlow est plus qu'un outil : c'est une solution simple pour une gestion fluide et traçable. Contactez-nous pour une démonstration personnalisée.
+      <h2 class="text-3xl font-bold mb-6">Prêt à optimiser votre gestion de stocks ?</h2>
+      <p class="text-xl mb-8 max-w-2xl mx-auto">
+        Découvrez comment StockFlow peut transformer votre processus de gestion des commandes et des livraisons.
       </p>
-      <a href="/auth/login" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-        Commencer Maintenant
-      </a>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/auth/login" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300 shadow-md">
+          Commencer maintenant
+        </a>
+      </div>
     </div>
   </section>
 </div>
