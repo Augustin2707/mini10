@@ -21,7 +21,7 @@
                         <a href="/" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Accueil</a>
                         <a href="/apropos" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">À propos</a>
                         <% if (typeof user !== 'undefined' && user) { %>
-                            <a href="/profile" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Suivi Personnel</a>
+                            <a href="/profile" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Profil</a>
                             <% if (user.role === 'admin') { %>
                                 <a href="/admin" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</a>
                             <% } else if (user.role === 'comptable') { %>
