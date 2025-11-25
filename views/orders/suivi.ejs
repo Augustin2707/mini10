@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <!-- Tableau des actions -->
+            <!-- Tableau des actions -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">
@@ -83,6 +83,7 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compte</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proposé par</th>
@@ -94,6 +95,11 @@
                     <% if (actions.length > 0) { %>
                         <% actions.forEach(action => { %>
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                    <%= action.account_code %>
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 <%= action.produit %>
                             </td>
@@ -123,7 +129,7 @@
                         <% }) %>
                     <% } else { %>
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                            <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
                                 <div class="flex flex-col items-center">
                                     <span class="text-4xl mb-2">📭</span>
                                     Aucune action enregistrée.

@@ -1,0 +1,234 @@
+<%- include('../partials/header', { title: 'Stocks Actuels - Mini10' }) %>
+
+<div class="container mx-auto px-4 py-6">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="mr-3">📋</i>Stocks Actuels
+            </h1>
+            <a href="/stock"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center">
+                <i class="mr-2">←</i>Retour au Stock
+            </a>
+        </div>
+        <p class="text-gray-600">
+            Bonjour <span class="font-semibold text-blue-600"><%= user.login %></span>
+            - Vue détaillée des stocks par compte
+        </p>
+    </div>
+
+    <!-- Cartes de statistiques globales -->
+    <% if (summary && summary.length > 0) { %>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <% 
+            const global = summary.reduce((acc, s) => ({ 
+                total_entrees: acc.total_entrees + (s.total_entrees || 0), 
+                total_sorties: acc.total_sorties + (s.total_sorties || 0), 
+                stock_actuel: acc.stock_actuel + (s.stock_actuel || 0),
+                total_comptes: summary.length
+            }), { total_entrees: 0, total_sorties: 0, stock_actuel: 0, total_comptes: 0 }); 
+        %>
+        
+        <div class="stock-card">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="text-blue-600 text-xl">💼</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Comptes</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= global.total_comptes %></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stock-card border-l-green-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                    <i class="text-green-600 text-xl">📥</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total Entrées</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= global.total_entrees %></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stock-card border-l-red-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-red-100 p-3 rounded-lg">
+                    <i class="text-red-600 text-xl">📤</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total Sorties</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= global.total_sorties %></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stock-card border-l-purple-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-purple-100 p-3 rounded-lg">
+                    <i class="text-purple-600 text-xl">📦</i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Stock Total</h3>
+                    <p class="text-2xl font-bold text-gray-900"><%= global.stock_actuel %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Section des totaux par compte -->
+    <% if (summary && summary.length > 0) { %>
+        <div class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                <i class="mr-2">📈</i>Résumé par Compte
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% summary.forEach(acc => { %>
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-lg font-semibold text-gray-900"><%= acc.account_name %></h4>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <%= acc.account_code %>
+                        </span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Stock Actuel:</span>
+                            <span class="text-sm font-semibold <%= acc.stock_actuel > 0 ? 'text-green-600' : 'text-red-600' %>">
+                                <%= acc.stock_actuel %>
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Entrées:</span>
+                            <span class="text-sm font-semibold text-green-600"><%= acc.total_entrees %></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Sorties:</span>
+                            <span class="text-sm font-semibold text-red-600"><%= acc.total_sorties %></span>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+        <% } %>
+
+    <!-- Tableau détaillé des stocks par compte -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+                <i class="mr-2">📊</i>Détail des Stocks par Compte
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compte</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité en Stock</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (stocks && stocks.length > 0) { %>
+                        <% let currentAccount = ''; %>
+                        <% stocks.forEach(stock => { %>
+                            <% if (stock.account_code !== currentAccount) { 
+                                currentAccount = stock.account_code;
+                            %>
+                            <tr class="bg-gray-50">
+                                <td colspan="4" class="px-6 py-3">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                            <i class="mr-2">💼</i>
+                                            <%= stock.account_code %> - <%= stock.account_name %>
+                                        </span>
+                                        <% 
+                                            const accountSummary = summary.find(s => s.account_code === stock.account_code);
+                                            if (accountSummary) { 
+                                        %>
+                                        <span class="ml-4 text-sm text-gray-600">
+                                            Stock: <strong><%= accountSummary.stock_actuel %></strong> | 
+                                            Entrées: <strong><%= accountSummary.total_entrees %></strong> | 
+                                            Sorties: <strong><%= accountSummary.total_sorties %></strong>
+                                        </span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% } %>
+                            
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                        <%= stock.account_code %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <%= stock.name %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        <%= stock.quantity > 10 ? 'bg-green-100 text-green-800' : 
+                                           stock.quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                                           'bg-red-100 text-red-800' %>">
+                                        <%= stock.quantity %> unités
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if (stock.quantity > 10) { %>
+                                        <span class="status-badge status-validated">Stock Suffisant</span>
+                                    <% } else if (stock.quantity > 0) { %>
+                                        <span class="status-badge status-pending">Stock Faible</span>
+                                    <% } else { %>
+                                        <span class="status-badge status-rejected">Rupture</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-4xl mb-2">📭</span>
+                                    Aucun stock disponible.
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+</div>
+
+<style>
+.stock-card {
+    @apply bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500;
+}
+
+.status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.status-validated {
+    @apply bg-green-100 text-green-800;
+}
+
+.status-pending {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-rejected {
+    @apply bg-red-100 text-red-800;
+}
+</style>
+
+<%- include('../partials/footer') %>

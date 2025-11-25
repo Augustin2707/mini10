@@ -22,12 +22,20 @@
                         <a href="/apropos" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">À propos</a>
                         <% if (typeof user !== 'undefined' && user) { %>
                             <a href="/profile" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Profil</a>
+                            
                             <% if (user.role === 'admin') { %>
                                 <a href="/admin" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</a>
+                                <a href="/stock/stocks-actuels" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Détail du Stock</a>
+                                <a href="/stock/suivi" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Suivi Comptable</a>
                             <% } else if (user.role === 'comptable') { %>
-                                <a href="/stock" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Gestion Stock</a>
-                            <% } else if (user.role === 'chef_principal' || user.role === 'chef_service') { %>
-                                <a href="/orders" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Commandes</a>
+                                <a href="/stock/stocks-actuels" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Détail du Stock</a>
+                                <a href="/stock/suivi" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Suivi Comptable</a>
+                            <% } else if (user.role === 'chef_principal') { %>
+                                <a href="/stock/stocks-actuels" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Détail du Stock</a>
+                                <a href="/orders/suivi" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Suivi Chef</a>
+                            <% } else if (user.role === 'chef_service') { %>
+                                <a href="/orders/create" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Nouvelle Commandes</a>
+                                <a href="/orders/suivi-service" class="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Mon Suivi</a>
                             <% } %>
                         <% } %>
                     </div>
@@ -35,7 +43,7 @@
                 <div class="flex items-center">
                     <% if (typeof user !== 'undefined' && user) { %>
                         <span class="text-blue-100 mr-4 text-sm">
-                            <i class="mr-1">👤</i><%= user.login %> (<%= user.role %>)
+                            <i class="mr-1">👤</i><%= user.login %> (<span class="capitalize"><%= user.role %></span>)
                         </span>
                         <a href="/auth/logout" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                             <i class="mr-1">🚪</i>Déconnexion

@@ -6,89 +6,194 @@ exports.getStockIndex = (req, res) => {
     return res.redirect('/auth/login');
   }
 
-  // Fetch produits pour formulaire
-  db.query('SELECT * FROM products', (err, products) => {
-    if (err) throw err;
+  // Fetch comptes
+  db.query('SELECT account_id, code, name FROM accounts ORDER BY code', (err, accounts) => {
+    if (err) {
+      console.error('Erreur lors du chargement des comptes:', err);
+      throw err;
+    }
 
-    // Fetch stocks actuels (tous rôles)
-    db.query(`
-      SELECT s.stock_id, s.quantity, p.name 
-      FROM stock s 
-      JOIN products p ON s.product_id = p.product_id
-    `, (err, stocks) => {
-      if (err) throw err;
-
-      // CORRECTION : Fetch séparé pour commandes à livrer ('validated') ET en livraison ('in_delivery')
-      // Seulement pour comptable ou admin
-      let ordersToDeliverQuery = '';
-      let ordersInDeliveryQuery = '';
-      let params = [];
-      if (user.role === 'comptable' || user.role === 'admin') {
-        // À livrer : validated
-        ordersToDeliverQuery = `
-          SELECT o.order_id, p.name AS product_name, o.quantity, o.motif, o.identifiant_utilisateur,
-                 o.created_at AS date_heure_commande
-          FROM orders o 
-          JOIN products p ON o.product_id = p.product_id 
-          WHERE o.status = 'validated' 
-          ORDER BY o.created_at DESC
-        `;
-        // En livraison : in_delivery
-        ordersInDeliveryQuery = `
-          SELECT o.order_id, p.name AS product_name, o.quantity, o.motif, o.identifiant_utilisateur,
-                 o.date_heure_livraison AS date_heure_commande
-          FROM orders o 
-          JOIN products p ON o.product_id = p.product_id 
-          WHERE o.status = 'in_delivery' 
-          ORDER BY o.created_at DESC
-        `;
+    // Fetch produits
+    db.query('SELECT * FROM products', (err, products) => {
+      if (err) {
+        console.error('Erreur lors du chargement des produits:', err);
+        throw err;
       }
 
-      // Exécute queries si applicable
-      const handleOrders = (errToDeliver, ordersToDeliver, errInDelivery, ordersInDelivery) => {
-        if (errToDeliver) throw errToDeliver;
-        if (errInDelivery) throw errInDelivery;
+      // Fetch stocks actuels avec calculs dynamiques via JOIN
+      db.query(`
+        SELECT s.stock_id, COALESCE(s.quantity, 0) as quantity, p.name, a.code AS account_code 
+        FROM products p 
+        JOIN accounts a ON p.account_id = a.account_id
+        LEFT JOIN stock s ON p.product_id = s.product_id
+        ORDER BY a.code, p.name
+      `, (err, stocks) => {
+        if (err) {
+          console.error('Erreur lors du chargement des stocks:', err);
+          throw err;
+        }
 
-        // Fetch propositions en attente (pour comptable/admin voir ses props)
-        db.query('SELECT se.*, p.name FROM stock_entries se JOIN products p ON se.product_id = p.product_id WHERE se.status = "pending"', (err, propositions) => {
-          if (err) throw err;
+        // Fetch totaux agrégés via la vue
+        db.query('SELECT * FROM stock_summary', (err, summary) => {
+          if (err) {
+            console.error('Erreur lors du chargement du résumé des stocks:', err);
+            throw err;
+          }
 
-          const propositionsFormatees = propositions.map(prop => ({
-            ...prop,
-            proposed_date: prop.proposed_date ? new Date(prop.proposed_date).toISOString().slice(0, 19).replace('T', ' ') : null
-          }));
+          // Commandes à livrer ('validated') ET en livraison ('in_delivery')
+          let ordersToDeliverQuery = '';
+          let ordersInDeliveryQuery = '';
+          
+          if (user.role === 'comptable' || user.role === 'admin') {
+            // À livrer : validated
+            ordersToDeliverQuery = `
+              SELECT o.order_id, p.name AS product_name, a.code AS account_code, o.quantity, o.motif, o.identifiant_utilisateur,
+                     o.created_at AS date_heure_commande
+              FROM orders o 
+              JOIN products p ON o.product_id = p.product_id 
+              JOIN accounts a ON p.account_id = a.account_id
+              WHERE o.status = 'validated' 
+              ORDER BY o.created_at DESC
+            `;
+            // En livraison : in_delivery
+            ordersInDeliveryQuery = `
+              SELECT o.order_id, p.name AS product_name, a.code AS account_code, o.quantity, o.motif, o.identifiant_utilisateur,
+                     o.date_heure_livraison AS date_heure_commande
+              FROM orders o 
+              JOIN products p ON o.product_id = p.product_id 
+              JOIN accounts a ON p.account_id = a.account_id
+              WHERE o.status = 'in_delivery' 
+              ORDER BY o.created_at DESC
+            `;
+          }
 
-          // Formate dates pour orders
-          const ordersToDeliverFormatees = ordersToDeliver ? ordersToDeliver.map(order => ({
-            ...order,
-            date_heure_commande: order.date_heure_commande ? new Date(order.date_heure_commande).toISOString().slice(0, 19).replace('T', ' ') : null
-          })) : [];
-          const ordersInDeliveryFormatees = ordersInDelivery ? ordersInDelivery.map(order => ({
-            ...order,
-            date_heure_commande: order.date_heure_commande ? new Date(order.date_heure_commande).toISOString().slice(0, 19).replace('T', ' ') : null
-          })) : [];
+          // Exécute queries si applicable
+          const handleOrders = (errToDeliver, ordersToDeliver, errInDelivery, ordersInDelivery) => {
+            if (errToDeliver) throw errToDeliver;
+            if (errInDelivery) throw errInDelivery;
 
-          res.render('stock/index', { 
-            products, 
-            stocks, 
-            orders: ordersToDeliverFormatees,  // À livrer
-            ordersInDelivery: ordersInDeliveryFormatees,  // En livraison
-            propositions: propositionsFormatees, 
-            user 
-          });
+            // Fetch propositions en attente avec comptes
+            db.query(`
+              SELECT se.*, p.name, a.code AS account_code 
+              FROM stock_entries se 
+              JOIN products p ON se.product_id = p.product_id 
+              JOIN accounts a ON p.account_id = a.account_id 
+              WHERE se.status = "pending"
+            `, (err, propositions) => {
+              if (err) {
+                console.error('Erreur lors du chargement des propositions:', err);
+                throw err;
+              }
+
+              const propositionsFormatees = propositions.map(prop => ({
+                ...prop,
+                proposed_date: prop.proposed_date ? new Date(prop.proposed_date).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null
+              }));
+
+              // Formate dates pour orders
+              const ordersToDeliverFormatees = ordersToDeliver ? ordersToDeliver.map(order => ({
+                ...order,
+                date_heure_commande: order.date_heure_commande ? new Date(order.date_heure_commande).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null
+              })) : [];
+              const ordersInDeliveryFormatees = ordersInDelivery ? ordersInDelivery.map(order => ({
+                ...order,
+                date_heure_commande: order.date_heure_commande ? new Date(order.date_heure_commande).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null
+              })) : [];
+
+              res.render('stock/index', { 
+                products, 
+                stocks, 
+                orders: ordersToDeliverFormatees,  // À livrer
+                ordersInDelivery: ordersInDeliveryFormatees,  // En livraison
+                propositions: propositionsFormatees, 
+                user,
+                accounts,  // Ajout des comptes pour le filtre
+                summary  // Pour afficher totaux dans la vue
+              });
+            });
+          };
+
+          if (ordersToDeliverQuery) {
+            db.query(ordersToDeliverQuery, (errToDeliver, ordersToDeliver) => {
+              db.query(ordersInDeliveryQuery, (errInDelivery, ordersInDelivery) => {
+                handleOrders(errToDeliver, ordersToDeliver, errInDelivery, ordersInDelivery);
+              });
+            });
+          } else {
+            handleOrders(null, [], null, []);
+          }
         });
-      };
-
-      if (ordersToDeliverQuery) {
-        db.query(ordersToDeliverQuery, (errToDeliver, ordersToDeliver) => {
-          db.query(ordersInDeliveryQuery, (errInDelivery, ordersInDelivery) => {
-            handleOrders(errToDeliver, ordersToDeliver, errInDelivery, ordersInDelivery);
-          });
-        });
-      } else {
-        handleOrders(null, [], null, []);
-      }
+      });
     });
+  });
+};
+
+// Fonction pour valider/ajouter stock
+exports.validateStockEntry = (req, res) => {
+  const user = req.session.user;
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
+    return res.redirect('/auth/login');
+  }
+
+  const { entry_id, action } = req.body;
+  const validatedBy = user.login;
+
+  console.log(`Validation d'entrée stock: entry_id=${entry_id}, action=${action}, validatedBy=${validatedBy}`);
+
+  if (action === 'validate') {
+    db.query(
+      'UPDATE stock_entries SET status = "validated", validated_date = NOW(), validated_by = ? WHERE entry_id = ?',
+      [validatedBy, entry_id],
+      (err) => {
+        if (err) {
+          console.error('Erreur lors de la validation de l\'entrée stock:', err);
+          throw err;
+        }
+        console.log(`Entrée stock ${entry_id} validée avec succès`);
+        if (req.flash) {
+          req.flash('success', 'Entrée validée et stock mis à jour.');
+        }
+        res.redirect('/stock');
+      }
+    );
+  } else if (action === 'reject') {
+    const { motif_rejet } = req.body;
+    db.query(
+      'UPDATE stock_entries SET status = "rejected", rejected_date = NOW(), motif_rejet = ? WHERE entry_id = ?',
+      [motif_rejet, entry_id],
+      (err) => {
+        if (err) {
+          console.error('Erreur lors du rejet de l\'entrée stock:', err);
+          throw err;
+        }
+        console.log(`Entrée stock ${entry_id} rejetée avec motif: ${motif_rejet}`);
+        if (req.flash) {
+          req.flash('info', 'Entrée rejetée.');
+        }
+        res.redirect('/stock');
+      }
+    );
+  } else {
+    console.error('Action non reconnue:', action);
+    res.redirect('/stock');
+  }
+};
+
+exports.getProductsByAccount = (req, res) => {
+  const { account_code } = req.params;
+  db.query(`
+    SELECT p.product_id, p.name, COALESCE(s.quantity, 0) as quantity 
+    FROM products p 
+    LEFT JOIN stock s ON p.product_id = s.product_id 
+    JOIN accounts a ON p.account_id = a.account_id 
+    WHERE a.code = ?
+    ORDER BY p.name
+  `, [account_code], (err, products) => {
+    if (err) {
+      console.error('Erreur lors du chargement des produits:', err);
+      return res.status(500).json({ error: 'Erreur serveur' });
+    }
+    res.json(products);
   });
 };
 
@@ -99,18 +204,21 @@ exports.proposeStockAdd = (req, res) => {
   }
   const { product_id, quantity_added } = req.body;
   const proposedBy = req.session.user.login;
+  
   db.query(
     'INSERT INTO stock_entries (product_id, quantity_added, proposed_by, proposed_date, status) VALUES (?, ?, ?, NOW(), "pending")',
     [product_id, quantity_added, proposedBy],
     (err) => {
-      if (err) throw err;
-      console.log('Proposition ajout stock par', proposedBy, 'pour product_id:', product_id); // Debug
+      if (err) {
+        console.error('Erreur lors de la proposition d\'ajout de stock:', err);
+        throw err;
+      }
+      console.log('Proposition ajout stock par', proposedBy, 'pour product_id:', product_id);
       res.redirect('/stock');
     }
   );
 };
 
-// CORRECTION : Fonction deliverOrder bien exportée et robuste
 exports.deliverOrder = (req, res) => {
   const user = req.session.user;
   if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
@@ -129,7 +237,7 @@ exports.deliverOrder = (req, res) => {
     }
     if (result.length === 0 || result[0].status !== 'validated') {
       console.log('Cannot deliver: order', order_id, 'not validated');
-      return res.redirect('/stock');  // Pas d'erreur user, juste skip
+      return res.redirect('/stock');
     }
     // Update
     db.query(
@@ -149,7 +257,7 @@ exports.deliverOrder = (req, res) => {
               console.error('Erreur log action:', err);
               throw err;
             }
-            console.log('Livraison effectuée par', userLogin, 'pour order_id:', order_id); // Debug
+            console.log('Livraison effectuée par', userLogin, 'pour order_id:', order_id);
             res.redirect('/stock');
           }
         );
@@ -158,35 +266,45 @@ exports.deliverOrder = (req, res) => {
   });
 };
 
-// Bloqué pour comptable : Redirige vers consultation
 exports.getEditStock = (req, res) => {
   const user = req.session.user;
   if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
-    return res.redirect('/stock');  // Ne peut pas éditer
+    return res.redirect('/stock');
   }
   
   const { stock_id } = req.params;
-  db.query('SELECT s.*, p.name FROM stock s JOIN products p ON s.product_id = p.product_id WHERE s.stock_id = ?', [stock_id], (err, stock) => {
-    if (err) throw err;
+  db.query(`
+    SELECT s.*, p.name, a.code AS account_code 
+    FROM stock s 
+    JOIN products p ON s.product_id = p.product_id 
+    JOIN accounts a ON p.account_id = a.account_id
+    WHERE s.stock_id = ?
+  `, [stock_id], (err, stock) => {
+    if (err) {
+      console.error('Erreur lors du chargement du stock à éditer:', err);
+      throw err;
+    }
     res.render('stock/edit', { stock: stock[0] });
   });
 };
 
 exports.updateStock = (req, res) => {
   const user = req.session.user;
-  if (!user || user.role !== 'chef_principal') {  // Réservé au chef seulement
+  if (!user || user.role !== 'chef_principal') {
     return res.redirect('/stock');
   }
   
   const { stock_id, quantity } = req.body;
   db.query('UPDATE stock SET quantity = ?, updated_at = NOW() WHERE stock_id = ?', [quantity, stock_id], (err) => {
-    if (err) throw err;
-    console.log('Stock mis à jour par chef pour stock_id:', stock_id, 'quantité:', quantity); // Debug
+    if (err) {
+      console.error('Erreur lors de la mise à jour du stock:', err);
+      throw err;
+    }
+    console.log('Stock mis à jour par chef pour stock_id:', stock_id, 'quantité:', quantity);
     res.redirect('/stock');
   });
 };
 
-// Version corrigée et étendue : Suivi générique pour tous rôles (chef_service=utl1, comptable, chef_principal, admin)
 exports.getSuivi = (req, res) => {
   const user = req.session.user;
   if (!user) {
@@ -201,15 +319,18 @@ exports.getSuivi = (req, res) => {
   let query = '';
   let params = [userId];
 
-  if (role === 'chef_service') {  // Pour utl1 (chef_service)
+  if (role === 'chef_service') {
     query = `
       SELECT oa.action_date as date_heure, 
              CONCAT('Livré par ', u.login) as action_display,
-             p.name as produit, o.quantity as quantite, o.status,
+             p.name as produit, 
+             a.code as account_code,
+             o.quantity as quantite, o.status,
              oa.auteur_login as auteur
       FROM order_actions oa 
       JOIN orders o ON oa.order_id = o.order_id
       JOIN products p ON o.product_id = p.product_id
+      JOIN accounts a ON p.account_id = a.account_id
       JOIN users u ON oa.user_id = u.user_id
       WHERE o.user_id = ? AND oa.action_type = 'deliver'
       ORDER BY oa.action_date DESC LIMIT 10
@@ -217,19 +338,21 @@ exports.getSuivi = (req, res) => {
     params = [userId];
 
   } else if (role === 'comptable' || role === 'admin') {
-    // Requête unifiée pour comptable/admin : livraisons + propositions/ajouts stock - CORRIGÉE pour statuts
+    // Requête unifiée pour comptable/admin : livraisons + propositions/ajouts stock avec comptes
     query = `
       -- Livraisons (commandes validées et livrées = sorties)
       SELECT 
         oa.action_date as date_heure,
         CONCAT('Livré à ', u.login) as action_display,
         p.name as produit,
+        a.code as account_code,
         o.quantity as quantite,
         'sortie' as statut,
         oa.auteur_login as auteur
       FROM order_actions oa
       JOIN orders o ON oa.order_id = o.order_id
       JOIN products p ON o.product_id = p.product_id
+      JOIN accounts a ON p.account_id = a.account_id
       JOIN users u ON o.user_id = u.user_id
       WHERE oa.user_id = ? AND oa.action_type = 'deliver'
       
@@ -240,11 +363,13 @@ exports.getSuivi = (req, res) => {
         se.proposed_date as date_heure,
         CONCAT('Proposition ajout stock - par ', se.proposed_by) as action_display,
         p.name as produit,
+        a.code as account_code,
         se.quantity_added as quantite,
         'en attente' as statut,
         se.proposed_by as auteur
       FROM stock_entries se
       JOIN products p ON se.product_id = p.product_id
+      JOIN accounts a ON p.account_id = a.account_id
       WHERE se.proposed_by = ? AND se.status = 'pending'
       
       UNION ALL
@@ -254,11 +379,13 @@ exports.getSuivi = (req, res) => {
         se.validated_date as date_heure,
         CONCAT('Ajout stock validé - proposé par ', se.proposed_by) as action_display,
         p.name as produit,
+        a.code as account_code,
         se.quantity_added as quantite,
         'entrée' as statut,
         se.validated_by as auteur
       FROM stock_entries se
       JOIN products p ON se.product_id = p.product_id
+      JOIN accounts a ON p.account_id = a.account_id
       WHERE se.proposed_by = ? AND se.status = 'validated'
       
       ORDER BY date_heure DESC
@@ -270,11 +397,14 @@ exports.getSuivi = (req, res) => {
     query = `
       SELECT oa.action_date as date_heure, 
              CONCAT('Validé commande - ', u.login) as action_display,
-             p.name as produit, o.quantity as quantite, o.status,
+             p.name as produit,
+             a.code as account_code,
+             o.quantity as quantite, o.status,
              oa.auteur_login as auteur
       FROM order_actions oa 
       JOIN orders o ON oa.order_id = o.order_id
       JOIN products p ON o.product_id = p.product_id
+      JOIN accounts a ON p.account_id = a.account_id
       JOIN users u ON o.user_id = u.user_id
       WHERE oa.user_id = ? AND oa.action_type = 'validate'
       ORDER BY oa.action_date DESC LIMIT 10
@@ -286,7 +416,10 @@ exports.getSuivi = (req, res) => {
   }
 
   db.query(query, params, (err, actions) => {
-    if (err) throw err;
+    if (err) {
+      console.error('Erreur lors de la récupération du suivi:', err);
+      throw err;
+    }
     
     const actionsFormatees = actions.map(action => {
       let dateFormatee = null;
@@ -305,31 +438,57 @@ exports.getSuivi = (req, res) => {
       return {
         ...action,
         date_heure: dateFormatee || 'Date non disponible',
-        statut: action.statut || 'N/A'  // Assure que statut est toujours défini
+        statut: action.statut || 'N/A'
       };
     });
     
-    console.log('Debug - Première action comptable:', actionsFormatees[0]);  // Pour vérifier statut
+    console.log('Debug - Première action comptable:', actionsFormatees[0]);
     
     res.render('stock/suivi', { actions: actionsFormatees, user: req.session.user });
   });
 };
 
-// Autres fonctions (si tu en as d'autres, ajoute-les ici – ex. validateOrder si besoin)
 exports.validateOrder = (req, res) => {
   const user = req.session.user;
   if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
     return res.redirect('/auth/login');
   }
-  // Si cette fonction existe ailleurs, copie-la ici ou supprime la route si inutilisée
-  res.redirect('/stock');  // Placeholder – adapte si besoin
+  res.redirect('/stock');
 };
 
-exports.validateStockEntry = (req, res) => {
+// NOUVELLE FONCTION : Page dédiée pour les stocks actuels (comptable, admin ET chef_principal)
+exports.getStocksActuels = (req, res) => {
   const user = req.session.user;
-  if (!user || (user.role !== 'comptable' && user.role !== 'admin')) {
+  if (!user || (user.role !== 'comptable' && user.role !== 'admin' && user.role !== 'chef_principal')) {
     return res.redirect('/auth/login');
   }
-  // Si cette fonction existe dans orderController, déplace-la ou adapte
-  res.redirect('/stock');  // Placeholder – adapte si besoin
+
+  // Fetch stocks actuels avec comptes
+  db.query(`
+    SELECT s.stock_id, COALESCE(s.quantity, 0) as quantity, p.name, a.code AS account_code, 
+           a.name AS account_name
+    FROM products p 
+    JOIN accounts a ON p.account_id = a.account_id
+    LEFT JOIN stock s ON p.product_id = s.product_id
+    ORDER BY a.code, p.name
+  `, (err, stocks) => {
+    if (err) {
+      console.error('Erreur lors du chargement des stocks actuels:', err);
+      throw err;
+    }
+
+    // Fetch totaux agrégés via la vue
+    db.query('SELECT * FROM stock_summary', (err, summary) => {
+      if (err) {
+        console.error('Erreur lors du chargement du résumé des stocks:', err);
+        throw err;
+      }
+
+      res.render('stock/stocks-actuels', { 
+        stocks, 
+        summary,
+        user 
+      });
+    });
+  });
 };
