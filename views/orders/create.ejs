@@ -128,7 +128,7 @@ function loadProducts() {
             products.forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.product_id;
-                option.textContent = `${product.name} (Stock: ${product.quantity || 0})`;
+                option.textContent = `${product.name} `;
                 productSelect.appendChild(option);
             });
             productSelect.disabled = false;
